@@ -4,7 +4,7 @@
 #' @param genome Which genome is this? Defaults to mm10. Other options are FILL IN!!
 #' @details \code{bed9_to_granges} Converts an imported bed file to a granges
 #' object for annotation.
-#' @example
+#' @examples
 #' bed_granges <- bed9_to_granges(bed9_dataframe, genome='hg19')
 #' bed_granges
 bed9_to_granges <- function(bed_dataframe, genome='mm10'){

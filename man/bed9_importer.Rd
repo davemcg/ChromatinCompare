@@ -22,3 +22,7 @@ Imports bed9 (9 column) files into R
 \code{bed9_importer} imports a 9 column bed file and retains proper
 encoding (character, integer) of the columns.
 }
+\examples{
+bed9_importer('~/your_bed_file.bed.gz', skip=1 )
+bed9_importer
+}
