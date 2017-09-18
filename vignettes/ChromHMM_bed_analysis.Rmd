@@ -10,24 +10,7 @@ library(ChromatinCompare)
 ```
 Set up annotations
 ```{r}
-library(annotatr)
-annots = c('mm10_basicgenes')
-annotations = build_annotations(genome = 'mm10', annotations = annots)
-seqlevelsStyle(annotations) <- "UCSC"
-seqlevels(annotations) <- sort(seqlevels(annotations))
-# remove annotations without a gene symbol and LOC* and LINC*
-annotations <- annotations %>% data.frame() %>% filter(!is.na(symbol)) %>% filter(!grepl('^LOC', symbol)) %>% filter(!grepl('^LINC',symbol))
-# intergenic
-annots_intergenic <- c('mm10_genes_intergenic')
-intergenic_annotations = build_annotations(genome = 'mm10', annotations = annots_intergenic)
-seqlevelsStyle(intergenic_annotations) <- "UCSC"
-seqlevels(intergenic_annotations) <- sort(seqlevels(intergenic_annotations))
-
-# merge annotations with intergenic
-annotations <- rbind(annotations, intergenic_annotations %>% data.frame())
-# rebuild granges
-annotations <- GRanges(seqnames=annotations$seqnames, ranges=IRanges(start=annotations$start, end = annotations$end), strand = annotations$strand , id = annotations$id, gene_id = annotations$id, symbol = annotations$symbol, type =annotations$type) 
-seqlevels(annotations) <- sort(seqlevels(annotations))
+annotations <- load_annotations(build='mm10', type='gene_body')
 ```
 
 ```{r}
@@ -40,19 +23,19 @@ mm10_hindbrain_e11.5_anno = annotate_regions(
   ignore.strand = TRUE,
   quiet = FALSE)
 
-retina_late_anno = annotate_regions(
-  regions = bed9_to_granges(retina_late),
+mm10_midbrain_e14.5_anno = annotate_regions(
+  regions = bed9_to_granges(mm10_midbrain_e14.5),
   annotations = annotations,
   ignore.strand = TRUE,
   quiet = FALSE)
 
 # capture classes
-classes <- retina_early_anno$name %>% unique %>% sort %>% data.frame() %>% magrittr::set_colnames('name')
+#classes <- retina_early_anno$name %>% unique %>% sort %>% data.frame() %>% magrittr::set_colnames('name')
 # reorder classes
-classes$name <- forcats::as_factor(classes$name) %>% forcats::fct_relevel('10_Open_Chromatin', after = Inf)
+#classes$name <- forcats::as_factor(classes$name) %>% forcats::fct_relevel('10_Open_Chromatin', after = Inf)
 
 # gene-wise query
-gene_chromhmm_stats <- retina_early_anno %>% 
+geneWise_hindbrain <- mm10_hindbrain_e11.5_anno %>% 
   data.frame() %>% 
   group_by(annot.symbol, name) %>% 
   summarise(bp_covered = sum(as.numeric(width))) %>% 
@@ -63,21 +46,51 @@ gene_chromhmm_stats <- retina_early_anno %>%
   group_by(annot.symbol, name) %>% 
   spread(name, `Feature Ratio`) %>%
   ungroup()
-gene_vector <- gene_chromhmm_stats$annot.symbol
-gene_chromhmm_stats <- gene_chromhmm_stats %>% ungroup() %>% dplyr::select(-annot.symbol) %>% as.matrix() %>% magrittr::set_rownames(gene_vector) 
+gene_vector <- geneWise_hindbrain$annot.symbol
+geneWise_hindbrain <- geneWise_hindbrain %>% ungroup() %>% dplyr::select(-annot.symbol) %>% as.matrix() %>% magrittr::set_rownames(gene_vector) 
 # replace na with zero
-gene_chromhmm_stats[is.na(gene_chromhmm_stats)] <- 0 
+geneWise_hindbrain[is.na(geneWise_hindbrain)] <- 0 
+geneWise_hindbrain <- geneWise_hindbrain[complete.cases(geneWise_hindbrain),]
+
+
+###
+# gene-wise query
+geneWise_midbrain <- mm10_midbrain_e14.5_anno %>% 
+  data.frame() %>% 
+  group_by(annot.symbol, name) %>% 
+  summarise(bp_covered = sum(as.numeric(width))) %>% 
+  group_by(annot.symbol) %>%
+  mutate(`Feature Ratio` = bp_covered/sum(bp_covered)) %>% 
+  dplyr::select(-bp_covered) %>% 
+  ungroup() %>% 
+  group_by(annot.symbol, name) %>% 
+  spread(name, `Feature Ratio`) %>%
+  ungroup()
+gene_vector <- geneWise_midbrain$annot.symbol
+geneWise_midbrain <- geneWise_midbrain %>% ungroup() %>% dplyr::select(-annot.symbol) %>% as.matrix() %>% magrittr::set_rownames(gene_vector) 
+# replace na with zero
+geneWise_midbrain[is.na(geneWise_midbrain)] <- 0 
+geneWise_midbrain <- geneWise_midbrain[complete.cases(geneWise_midbrain),]
 ```
 
 Distance between two genes
 ```{r}
-dist(rbind(gene_chromhmm_stats[2,],gene_chromhmm_stats[1,]))
+dist(rbind(geneWise_hindbrain[2,],geneWise_hindbrain[1,]))
+
+gene_names <- row.names(geneWise_hindbrain)[!is.na(row.names(geneWise_hindbrain))]
+
+
+distances <- c(1:length(gene_names))
+for (i in 1:length(gene_names)){
+  distances[i] <- dist(rbind(geneWise_hindbrain[gene_names[i],], geneWise_midbrain[gene_names[i],]))
+}
+gene_distances$`Euclidean Distance` <- distances
 ```
 
 Pictures
 ```{r}
-genes <- c('Abca4','Pax6','Crx','Nrl')
-ggplot(gene_chromhmm_stats[genes,] %>% 
+genes <- c('Terf1','Elk4','Ush2a','Sept2')
+ggplot(geneWise_hindbrain[genes,] %>% 
          as.tibble() %>% 
          mutate(Gene = genes) %>% 
          gather(Class, Value, -Gene) %>% 
@@ -91,5 +104,8 @@ ggplot(gene_chromhmm_stats[genes,] %>%
 
 Superheat
 ```{r}
-
+superheat(geneWise_hindbrain,
+          pretty.order.rows = T,
+          bottom.label.text.angle = 90,
+          bottom.label.size = 0.5)
 ```
