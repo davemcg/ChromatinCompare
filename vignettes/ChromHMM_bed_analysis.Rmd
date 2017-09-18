@@ -6,6 +6,7 @@ output: html_notebook
 Load in functions
 ```{r}
 library(tidyverse)
+library(ChromatinCompare)
 source('src/chromhmm_bed_input_funcs.R')
 ```
 Set up annotations

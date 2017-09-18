@@ -7,9 +7,9 @@
 bed9_to_granges(bed_dataframe, genome = "mm10")
 }
 \arguments{
-\item{A}{Imported bed object (from \code{bed9_importer})}
+\item{bed_dataframe}{Imported bed data.frame() object (from \code{bed9_importer})}
 
-\item{B}{Which genome is this? Defaults to mm10. Other options are FILL IN!!}
+\item{genome}{Which genome is this? Defaults to mm10. Other options are FILL IN!!}
 }
 \description{
 Converts imported bed file to granges object

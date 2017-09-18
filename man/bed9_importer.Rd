@@ -7,12 +7,12 @@
 bed9_importer(bed, uncompress_keep = TRUE, skip = 0)
 }
 \arguments{
-\item{A}{Path to the bed file}
+\item{bed}{Path to the bed file}
 
-\item{B}{If the bed file is compressed, should the uncompressed file be 
+\item{uncompress_keep}{If the bed file is compressed, should the uncompressed file be
 retained or removed? Defaults to TRUE.}
 
-\item{C}{How many lines to skip? Defaults to zero. You must look at the 
+\item{skip}{How many lines to skip? Defaults to zero. You must look at the
 first few lines of the bed file to determine if non bed entries are present.}
 }
 \description{

@@ -7,7 +7,7 @@
 convert_bigBed_to_bed(bigBed)
 }
 \arguments{
-\item{A}{Path to the bigBed file}
+\item{bigBed}{Path to the bigBed file}
 }
 \description{
 Wrapper to converted bigBed to bed, using UCSC bedToBigBed tool
@@ -17,5 +17,5 @@ You must have the UCSC bedToBigBed tool installed. UCSC provides pre-built binar
 }
 \examples{
 bed_file_path <- convert_bigBed_to_bed('~/mm10_hela_chromhmm.bigBed')
-
+bed_file_path
 }
