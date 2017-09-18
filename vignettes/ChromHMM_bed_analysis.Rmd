@@ -32,8 +32,8 @@ seqlevels(annotations) <- sort(seqlevels(annotations))
 ```
 
 ```{r}
-retina_early <- bed9_input('data/retina_Early_10090_10_dense.bed', skip=1)
-retina_late <- bed9_input('data/retina_Late_10090_10_dense.bed', skip=1)
+retina_early <- bed9_importer('~/git/eye_epigenome/data/retina_Early_10090_10_dense.bed', skip=1)
+retina_late <- bed9_importer('data/retina_Late_10090_10_dense.bed', skip=1)
 # Intersect the regions we read in with the annotations
 retina_early_anno = annotate_regions(
   regions = bed9_to_granges(retina_early),
