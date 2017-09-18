@@ -1,0 +1,95 @@
+---
+title: "Analyze ChromHMM bed files"
+output: html_notebook
+---
+
+Load in functions
+```{r}
+library(tidyverse)
+source('src/chromhmm_bed_input_funcs.R')
+```
+Set up annotations
+```{r}
+library(annotatr)
+annots = c('mm10_basicgenes')
+annotations = build_annotations(genome = 'mm10', annotations = annots)
+seqlevelsStyle(annotations) <- "UCSC"
+seqlevels(annotations) <- sort(seqlevels(annotations))
+# remove annotations without a gene symbol and LOC* and LINC*
+annotations <- annotations %>% data.frame() %>% filter(!is.na(symbol)) %>% filter(!grepl('^LOC', symbol)) %>% filter(!grepl('^LINC',symbol))
+# intergenic
+annots_intergenic <- c('mm10_genes_intergenic')
+intergenic_annotations = build_annotations(genome = 'mm10', annotations = annots_intergenic)
+seqlevelsStyle(intergenic_annotations) <- "UCSC"
+seqlevels(intergenic_annotations) <- sort(seqlevels(intergenic_annotations))
+
+# merge annotations with intergenic
+annotations <- rbind(annotations, intergenic_annotations %>% data.frame())
+# rebuild granges
+annotations <- GRanges(seqnames=annotations$seqnames, ranges=IRanges(start=annotations$start, end = annotations$end), strand = annotations$strand , id = annotations$id, gene_id = annotations$id, symbol = annotations$symbol, type =annotations$type) 
+seqlevels(annotations) <- sort(seqlevels(annotations))
+```
+
+```{r}
+retina_early <- bed9_input('data/retina_Early_10090_10_dense.bed', skip=1)
+retina_late <- bed9_input('data/retina_Late_10090_10_dense.bed', skip=1)
+# Intersect the regions we read in with the annotations
+retina_early_anno = annotate_regions(
+  regions = bed9_to_granges(retina_early),
+  annotations = annotations,
+  ignore.strand = TRUE,
+  quiet = FALSE)
+
+retina_late_anno = annotate_regions(
+  regions = bed9_to_granges(retina_late),
+  annotations = annotations,
+  ignore.strand = TRUE,
+  quiet = FALSE)
+
+# capture classes
+classes <- retina_early_anno$name %>% unique %>% sort %>% data.frame() %>% magrittr::set_colnames('name')
+# reorder classes
+classes$name <- forcats::as_factor(classes$name) %>% forcats::fct_relevel('10_Open_Chromatin', after = Inf)
+
+# gene-wise query
+gene_chromhmm_stats <- retina_early_anno %>% 
+  data.frame() %>% 
+  group_by(annot.symbol, name) %>% 
+  summarise(bp_covered = sum(as.numeric(width))) %>% 
+  group_by(annot.symbol) %>%
+  mutate(`Feature Ratio` = bp_covered/sum(bp_covered)) %>% 
+  dplyr::select(-bp_covered) %>% 
+  ungroup() %>% 
+  group_by(annot.symbol, name) %>% 
+  spread(name, `Feature Ratio`) %>%
+  ungroup()
+gene_vector <- gene_chromhmm_stats$annot.symbol
+gene_chromhmm_stats <- gene_chromhmm_stats %>% ungroup() %>% dplyr::select(-annot.symbol) %>% as.matrix() %>% magrittr::set_rownames(gene_vector) 
+# replace na with zero
+gene_chromhmm_stats[is.na(gene_chromhmm_stats)] <- 0 
+```
+
+Distance between two genes
+```{r}
+dist(rbind(gene_chromhmm_stats[2,],gene_chromhmm_stats[1,]))
+```
+
+Pictures
+```{r}
+genes <- c('Abca4','Pax6','Crx','Nrl')
+ggplot(gene_chromhmm_stats[genes,] %>% 
+         as.tibble() %>% 
+         mutate(Gene = genes) %>% 
+         gather(Class, Value, -Gene) %>% 
+         mutate(Class= gsub('_',' ', x=Class) %>% forcats::fct_relevel(as.factor(.), '10 Open Chromatin', after = Inf)), 
+       aes(x=Gene, fill=Class,y=Value)) + 
+  scale_fill_viridis(option='viridis', discrete = TRUE) +
+  geom_bar(stat='identity') + 
+  
+  theme_bw()
+```
+
+Superheat
+```{r}
+
+```
