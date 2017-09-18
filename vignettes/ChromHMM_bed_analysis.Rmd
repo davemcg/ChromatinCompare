@@ -7,7 +7,6 @@ Load in functions
 ```{r}
 library(tidyverse)
 library(ChromatinCompare)
-source('src/chromhmm_bed_input_funcs.R')
 ```
 Set up annotations
 ```{r}
@@ -32,11 +31,11 @@ seqlevels(annotations) <- sort(seqlevels(annotations))
 ```
 
 ```{r}
-retina_early <- bed9_importer('~/git/eye_epigenome/data/retina_Early_10090_10_dense.bed', skip=1)
-retina_late <- bed9_importer('data/retina_Late_10090_10_dense.bed', skip=1)
+mm10_hindbrain_e11.5 <- bed9_importer(system.file('extdata','ENCFF195OWF.chr1.bed.gz',package='ChromatinCompare'), skip=0)
+mm10_midbrain_e14.5 <- bed9_importer(system.file('extdata','ENCFF643NHA.chr1.bed.gz',package='ChromatinCompare'), skip=0)
 # Intersect the regions we read in with the annotations
-retina_early_anno = annotate_regions(
-  regions = bed9_to_granges(retina_early),
+mm10_hindbrain_e11.5_anno = annotate_regions(
+  regions = bed9_to_granges(mm10_hindbrain_e11.5),
   annotations = annotations,
   ignore.strand = TRUE,
   quiet = FALSE)
