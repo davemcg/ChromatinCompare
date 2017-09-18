@@ -1,0 +1,40 @@
+Package: ChromatinCompare
+Title: Compare and analyze chromatin segmentation (ChromHMM, Segway, etc.) differences
+Version: 0.0.0.9000
+Authors@R: person("David", "McGaughey", email = "mcgaugheyd@mail.nih.gov", role = c("aut", "cre"))
+Description: ChromatinCompare takes, as input, bed files of chromatin 
+  segmentation from programs like ChromHMM (http://compbio.mit.edu/ChromHMM/) 
+  and Segway (http://segway.hoffmanlab.org) and provides tools to quickly 
+  visualize and compare differences between segmentation files at 
+  user-selectable level (e.g. gene body, exons only, promoter regions). 
+  ChromDiff (http://compbio.mit.edu/ChromDiff/) provides similar functionality, 
+  but requires a large set of carefully formatted inputs and only works at the
+  gene level. 
+Depends: R (>= 3.4.1)
+License: **Public Domain Notice**
+  Parts of this software are a United States Government Work. Anyone may use 
+  the software on a worldwide and royalty-free basis for any purpose and anyone 
+  may reproduce and prepare derivative works without restriction. Although all
+  reasonable efforts have been taken to ensure the accuracy and reliability of 
+  the software, the National Eye Institute (NEI), National Institutes of Health 
+  (NIH) and the U.S. Government do not and cannot warrant the performance or any 
+  results that may be obtained by using this software. NEI, NIH and the 
+  U.S. Government disclaim all warranties as to performance, merchantability 
+  or fitness for any particular purpose.  No indemnification is intended or 
+  provided by the US government.
+  In any work produced using or in any product derived from this material, 
+  the authors would appreciate being acknowledged per scientific custom as the 
+  source of the software.
+  **Copyrighted Works**
+  ChromatinCompare uses copyrighted work and distributes these works under the 
+  terms of their respective licenses. All copyright restrictions still apply to 
+  these 'third-party' packages.  
+Encoding: UTF-8
+LazyData: true
+Imports: 
+  readr,
+  dplyr,
+  tidyr,
+  annotatr,
+  GenomicRanges
+RoxygenNote: 6.0.1
