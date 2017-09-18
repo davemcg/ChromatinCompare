@@ -10,7 +10,7 @@ Description: ChromatinCompare takes, as input, bed files of chromatin
   ChromDiff (http://compbio.mit.edu/ChromDiff/) provides similar functionality, 
   but requires a large set of carefully formatted inputs and only works at the
   gene level. 
-Depends: R (>= 3.4.1)
+Depends: R (>= 3.4.0)
 License: **Public Domain Notice**
   Parts of this software are a United States Government Work. Anyone may use 
   the software on a worldwide and royalty-free basis for any purpose and anyone 
@@ -36,5 +36,10 @@ Imports:
   dplyr,
   tidyr,
   annotatr,
-  GenomicRanges
+  GenomicRanges,
+  GenomeInfoDb,
+Suggests:
+  viridis,
+  ggplot,
+  superheat
 RoxygenNote: 6.0.1
