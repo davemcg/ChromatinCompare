@@ -18,7 +18,3 @@ Converts imported bed file to granges object
 \code{bed9_to_granges} Converts an imported bed file to a granges
 object for annotation.
 }
-\examples{
-bed_granges <- bed9_to_granges(bed9_dataframe, genome='hg19')
-bed_granges
-}

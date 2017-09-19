@@ -5,9 +5,6 @@
 #' only, intron only.
 #' @details \code{load_annotations} Loads in species and build specific annotations
 #' encoding (character, integer) of the columns.
-#' @examples
-#' annotations <- load_annotations(build= 'mm10', type='gene_byd' )
-#' annotations
 load_annotations <- function(build='mm10', type='gene_body'){
   annots = c('mm10_basicgenes')
   annotations = annotatr::build_annotations(genome = 'mm10', annotations = annots)

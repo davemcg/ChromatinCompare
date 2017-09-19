@@ -38,6 +38,7 @@ Imports:
   annotatr,
   GenomicRanges,
   GenomeInfoDb,
+  IRanges
 Suggests:
   viridis,
   ggplot,

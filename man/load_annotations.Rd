@@ -19,7 +19,3 @@ Load species and build specific annotations
 \code{load_annotations} Loads in species and build specific annotations
 encoding (character, integer) of the columns.
 }
-\examples{
-annotations <- load_annotations(build= 'mm10', type='gene_byd' )
-annotations
-}
